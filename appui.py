@@ -7,9 +7,22 @@ import numpy as np
 model2 = pickle.load(open('model2.pkl', 'rb'))
 
 # Team and venue lists
-teams = ['Lucknow Super Giants', 'Rising Pune Supergiants', 'Punjab Kings', 'Pune Warriors', 'Kolkata Knight Riders', 'Mumbai Indians', 'Gujarat Lions', 'Kings XI Punjab', 'Delhi Capitals', 'Rising Pune Supergiant', 'Chennai Super Kings', 'Kochi Tuskers Kerala', 'Royal Challengers Bangalore', 'Gujarat Titans', 'Sunrisers Hyderabad', 'Delhi Daredevils', 'Deccan Chargers', 'Rajasthan Royals']
+teams = ['Lucknow Super Giants', 'Rising Pune Supergiants', 'Punjab Kings', 'Pune Warriors', 'Kolkata Knight Riders', 
+         'Mumbai Indians', 'Gujarat Lions', 'Kings XI Punjab', 'Delhi Capitals', 'Rising Pune Supergiant', 
+         'Chennai Super Kings', 'Kochi Tuskers Kerala', 'Royal Challengers Bangalore', 'Gujarat Titans', 
+         'Sunrisers Hyderabad', 'Delhi Daredevils', 'Deccan Chargers', 'Rajasthan Royals']
 
-venue = ['M Chinnaswamy Stadium', 'Punjab Cricket Association Stadium, Mohali', 'Feroz Shah Kotla', 'Wankhede Stadium', 'Eden Gardens', 'Sawai Mansingh Stadium', 'Rajiv Gandhi International Stadium, Uppal', 'MA Chidambaram Stadium, Chepauk', 'Dr DY Patil Sports Academy', 'Newlands', "St George's Park", 'Kingsmead', 'SuperSport Park', 'Buffalo Park', 'New Wanderers Stadium', 'De Beers Diamond Oval', 'OUTsurance Oval', 'Brabourne Stadium', 'Sardar Patel Stadium, Motera', 'Barabati Stadium', 'Brabourne Stadium, Mumbai', 'Vidarbha Cricket Association Stadium, Jamtha', 'Himachal Pradesh Cricket Association Stadium', 'Nehru Stadium', 'Holkar Cricket Stadium', 'Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium', 'Subrata Roy Sahara Stadium', 'Maharashtra Cricket Association Stadium', 'Shaheed Veer Narayan Singh International Stadium', 'JSCA International Stadium Complex', 'Sheikh Zayed Stadium', 'Sharjah Cricket Stadium', 'Dubai International Cricket Stadium', 'Punjab Cricket Association IS Bindra Stadium, Mohali', 'Saurashtra Cricket Association Stadium', 'Green Park', 'M.Chinnaswamy Stadium', 'Punjab Cricket Association IS Bindra Stadium', 'Rajiv Gandhi International Stadium', 'MA Chidambaram Stadium', 'Arun Jaitley Stadium', 'MA Chidambaram Stadium, Chepauk, Chennai', 'Wankhede Stadium, Mumbai', 'Narendra Modi Stadium, Ahmedabad', 'Arun Jaitley Stadium, Delhi', 'Zayed Cricket Stadium, Abu Dhabi', 'Dr DY Patil Sports Academy, Mumbai', 'Maharashtra Cricket Association Stadium, Pune', 'Eden Gardens, Kolkata', 'Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh', 'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow', 'Rajiv Gandhi International Stadium, Uppal, Hyderabad', 'M Chinnaswamy Stadium, Bengaluru', 'Barsapara Cricket Stadium, Guwahati', 'Sawai Mansingh Stadium, Jaipur', 'Himachal Pradesh Cricket Association Stadium, Dharamsala']
+venue = ['M Chinnaswamy Stadium', 'Punjab Cricket Association Stadium', 'Feroz Shah Kotla', 'Wankhede Stadium', 
+         'Eden Gardens', 'Sawai Mansingh Stadium', 'Rajiv Gandhi International Stadium', 'MA Chidambaram Stadium', 
+         'Dr DY Patil Sports Academy', 'Newlands', "St George's Park", 'Kingsmead', 'SuperSport Park', 'Buffalo Park', 
+         'New Wanderers Stadium', 'De Beers Diamond Oval', 'OUTsurance Oval', 'Brabourne Stadium', 'Sardar Patel Stadium', 
+         'Barabati Stadium', 'Vidarbha Cricket Association Stadium', 'Himachal Pradesh Cricket Association Stadium', 
+         'Nehru Stadium', 'Holkar Cricket Stadium', 'Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium', 
+         'Subrata Roy Sahara Stadium', 'Maharashtra Cricket Association Stadium', 'Shaheed Veer Narayan Singh International Stadium', 
+         'JSCA International Stadium Complex', 'Sheikh Zayed Stadium', 'Sharjah Cricket Stadium', 'Dubai International Cricket Stadium', 
+         'Punjab Cricket Association IS Bindra Stadium', 'Saurashtra Cricket Association Stadium', 'Green Park', 
+         'Arun Jaitley Stadium', 'Narendra Modi Stadium', 'Zayed Cricket Stadium', 
+         'Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium', 'Barsapara Cricket Stadium']
 
 # Streamlit UI
 st.set_page_config(page_title='IPL Score Predictor', layout='wide')
@@ -35,8 +48,26 @@ stadium = st.selectbox('🏟️ SELECT STADIUM', sorted(venue))
 col3, col4, col5, col6 = st.columns(4)
 with col3:
     curr_score = st.number_input('📊 CURRENT SCORE', min_value=0, step=1)
+
 with col4:
-    overs = st.number_input('⏳ OVERS (Min: 5)', min_value=5, step=1)
+    overs = st.number_input('⏳ OVERS DONE (Min: 5.0)', min_value=5.0, step=0.1, format="%.1f")
+
+    # Convert overs into valid cricket format
+    overs_int = int(overs)  # Get the over part (before decimal)
+    balls = round((overs - overs_int) * 10)  # Get the ball count (after decimal)
+
+    # If balls exceed 5, round up to next over
+    if balls > 5:
+        overs_int += 1
+        balls = 0
+
+    # Create valid overs format (ensures only X.0 to X.5)
+    overs = float(f"{overs_int}.{balls}")
+
+    # Display corrected value in Streamlit
+    st.write(f"✅ Adjusted Overs: {overs}")
+
+
 with col5:
     Wickets = st.number_input('❌ WICKETS LOST', min_value=0, max_value=10, step=1)
 with col6:
@@ -45,7 +76,7 @@ with col6:
 last_five = st.number_input('🔥 Runs scored in last 5 overs', min_value=0, step=1)
 
 if st.button("🎯 PREDICT SCORE"):
-    ball_left = 120 - overs * 6
+    ball_left = 120 - int(overs * 6)
     crr = curr_score / overs
     wkt = 10 - Wickets
     

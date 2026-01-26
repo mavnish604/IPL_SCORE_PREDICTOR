@@ -45,5 +45,5 @@ The model is deployed and accessible online.
 ## 🤝 Contributing
 Feel free to fork the repository, submit issues, or create pull requests to improve the project.
 
-**Connect with me on LinkedIn:** (https://www.linkedin.com/in/mavnish604/) 🚀
+**Connect with me on LinkedIn:** (https://www.linkedin.com/in/mavnish604/) 
 
